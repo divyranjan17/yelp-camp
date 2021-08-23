@@ -39,7 +39,7 @@ const seedDB = async() => {
                 {
                     url: 'https://res.cloudinary.com/dvyelp/image/upload/v1629651586/YelpCamp/a5s3sie9rb7ml59jwwtp.jpg',
                     filename: 'YelpCamp/a5s3sie9rb7ml59jwwtp'
-                } 
+                }
             ]
         });
         await camp.save();

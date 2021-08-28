@@ -5,8 +5,6 @@ if(process.env.NODE_ENV !== 'production') {
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
-const server = '127.0.0.1: 27017';
-const database = 'yelp-camp';
 const ejsMate = require('ejs-mate');
 const session = require('express-session');
 const flash = require('connect-flash');
@@ -22,8 +20,10 @@ const helmet = require('helmet');
 const userRoutes = require('./routes/users');
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
+const MongoStore = require('connect-mongo');
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
 
-mongoose.connect(`mongodb://${server}/${database}`, {
+mongoose.connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -49,14 +49,26 @@ app.use(mongoSanitize({
     replaceWith: '_'
 }));
 
+const secret = process.env.SECRET || 'thisshouldbeabettersecret';
+
+const store = new MongoStore({
+    mongoUrl: dbUrl,
+    secret,
+    touchAfter: 24*3600
+});
+
+store.on("error", function(e) {
+    console.log("SESSION STORE ERROR", e);
+})
+
 const sessionConfig = {
+    store,
     name: 'session',
-    secret: 'thisshouldbeabettersecret',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
-        // secure: true,
         expires: Date.now() + 1000*60*60*24*7,
         maxAge: 1000*60*60*24*7
     }

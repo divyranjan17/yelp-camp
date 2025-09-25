@@ -104,6 +104,7 @@ const connectSrcUrls = [
     // "https://b.tiles.mapbox.com/",
     // "https://events.mapbox.com/",
     "https://api.maptiler.com/",
+    "https://cdn.jsdelivr.net",
 ];
 const fontSrcUrls = [];
 app.use(
@@ -121,6 +122,7 @@ app.use(
                 "data:",
                 "https://res.cloudinary.com/dvyelp/",
                 "https://images.unsplash.com/",
+                "https://api.maptiler.com/",
             ],
             fontSrc: ["'self'", ...fontSrcUrls],
         },

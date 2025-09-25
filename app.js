@@ -51,10 +51,12 @@ app.use(mongoSanitize({
 
 const secret = process.env.SECRET || 'thisshouldbeabettersecret';
 
-const store = new MongoStore({
+const store = MongoStore.create(({
     mongoUrl: dbUrl,
-    secret,
-    touchAfter: 24*3600
+    touchAfter: 24*3600,
+    crypto: {
+        secret: secret
+    }
 });
 
 store.on("error", function(e) {
@@ -79,26 +81,29 @@ app.use(helmet());
 
 const scriptSrcUrls = [
     "https://stackpath.bootstrapcdn.com/",
-    "https://api.tiles.mapbox.com/",
-    "https://api.mapbox.com/",
+    // "https://api.tiles.mapbox.com/",
+    // "https://api.mapbox.com/",
     "https://kit.fontawesome.com/",
     "https://cdnjs.cloudflare.com/",
     "https://cdn.jsdelivr.net",
+    "https://cdn.maptiler.com/",
 ];
 const styleSrcUrls = [
     "https://kit-free.fontawesome.com/",
     "https://stackpath.bootstrapcdn.com/",
-    "https://api.mapbox.com/",
-    "https://api.tiles.mapbox.com/",
+    // "https://api.mapbox.com/",
+    // "https://api.tiles.mapbox.com/",
     "https://fonts.googleapis.com/",
     "https://use.fontawesome.com/",
     "https://cdn.jsdelivr.net",
+    "https://cdn.maptiler.com/",
 ];
 const connectSrcUrls = [
-    "https://api.mapbox.com/",
-    "https://a.tiles.mapbox.com/",
-    "https://b.tiles.mapbox.com/",
-    "https://events.mapbox.com/",
+    // "https://api.mapbox.com/",
+    // "https://a.tiles.mapbox.com/",
+    // "https://b.tiles.mapbox.com/",
+    // "https://events.mapbox.com/",
+    "https://api.maptiler.com/",
 ];
 const fontSrcUrls = [];
 app.use(

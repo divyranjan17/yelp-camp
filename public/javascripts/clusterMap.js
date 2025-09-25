@@ -1,21 +1,15 @@
-mapboxgl.accessToken = mapToken;
-const map = new mapboxgl.Map({
-    container: 'cluster-map',
-    style: 'mapbox://styles/mapbox/light-v10',
-    center: [-103.5917, 40.6699],
+maptilersdk.config.apiKey = maptilerApiKey;
+
+const map = new maptilersdk.Map({
+    container: 'map',
+    style: maptilersdk.MapStyle.BRIGHT,
+    center: [-103.59179687498357, 40.66995747013945],
     zoom: 3
 });
 
-map.addControl(new mapboxgl.NavigationControl());
-
-map.on('load', () => {
-    // Add a new source from our GeoJSON data and
-    // set the 'cluster' option to true. GL-JS will
-    // add the point_count property to your source data.
+map.on('load', function () {
     map.addSource('campgrounds', {
         type: 'geojson',
-        // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
-        // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
         data: campgrounds,
         cluster: true,
         clusterMaxZoom: 14, // Max zoom to cluster points on
@@ -28,11 +22,8 @@ map.on('load', () => {
         source: 'campgrounds',
         filter: ['has', 'point_count'],
         paint: {
-            // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
+            // Use step expressions (https://docs.maptiler.com/gl-style-specification/expressions/#step)
             // with three steps to implement three types of circles:
-            //   * Blue, 20px circles when point count is less than 100
-            //   * Yellow, 30px circles when point count is between 100 and 750
-            //   * Pink, 40px circles when point count is greater than or equal to 750
             'circle-color': [
                 'step',
                 ['get', 'point_count'],
@@ -80,30 +71,24 @@ map.on('load', () => {
     });
 
     // inspect a cluster on click
-    map.on('click', 'clusters', (e) => {
+    map.on('click', 'clusters', async (e) => {
         const features = map.queryRenderedFeatures(e.point, {
             layers: ['clusters']
         });
         const clusterId = features[0].properties.cluster_id;
-        map.getSource('campgrounds').getClusterExpansionZoom(
-            clusterId,
-            (err, zoom) => {
-                if (err) return;
-
-                map.easeTo({
-                    center: features[0].geometry.coordinates,
-                    zoom: zoom
-                });
-            }
-        );
+        const zoom = await map.getSource('campgrounds').getClusterExpansionZoom(clusterId);
+        map.easeTo({
+            center: features[0].geometry.coordinates,
+            zoom
+        });
     });
 
     // When a click event occurs on a feature in
     // the unclustered-point layer, open a popup at
     // the location of the feature, with
     // description HTML from its properties.
-    map.on('click', 'unclustered-point', (e) => {
-        const {popUpMarkup} = e.features[0].properties;
+    map.on('click', 'unclustered-point', function (e) {
+        const { popUpMarkup } = e.features[0].properties;
         const coordinates = e.features[0].geometry.coordinates.slice();
 
         // Ensure that if the map is zoomed out such that
@@ -113,7 +98,7 @@ map.on('load', () => {
             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
         }
 
-        new mapboxgl.Popup()
+        new maptilersdk.Popup()
             .setLngLat(coordinates)
             .setHTML(popUpMarkup)
             .addTo(map);

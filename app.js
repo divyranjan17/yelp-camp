@@ -51,7 +51,7 @@ app.use(mongoSanitize({
 
 const secret = process.env.SECRET || 'thisshouldbeabettersecret';
 
-const store = MongoStore.create(({
+const store = MongoStore.create({
     mongoUrl: dbUrl,
     touchAfter: 24*3600,
     crypto: {
